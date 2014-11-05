@@ -4,9 +4,10 @@
 
 	var _ = function(){
 
-		var _call = function(opts){
+		var _get = function(opts){
 			opts.url = _apiEndpoint + opts.url + '?access_token=' + this.token;
-			opts.type = opts.type || 'GET';
+			opts.type = 'GET';
+
 			var oldSuccess = opts.success || function(){};
 			opts.success = function(a,b,c){
 				console.log(arguments);
@@ -15,18 +16,37 @@
 			return $.ajax(opts);
 		}
 
+		var _post = function(opts){
+			opts.url = _apiEndpoint + opts.url;
+			opts.type = opts.type || 'POST';
+
+			var oldSuccess = opts.success || function(){};
+			opts.success = function(a,b,c){
+				console.log(arguments);
+				oldSuccess.call(this, arguments);
+			}
+
+			opts.crossDomain = true;
+
+			opts.beforeSend = function (request) {
+                request.setRequestHeader("Authorization", this.token);
+            }
+
+			return $.ajax(opts);
+		}
+
 		this.setToken = function(token){
 			this.token = token;
 		}
 
 		this.getShot = function(shotId){
-			return _call.call(this, {
+			return _get.call(this, {
 				url: '/shots/' + shotId
 			});
 		}
 
 		this.getCurrentUser = function(){
-			return _call.call(this, {
+			return _get.call(this, {
 				url: '/user'
 			})
 		}
@@ -34,7 +54,7 @@
 		this.doesCurrentUserLikeShot = function(shotId){
 			var deferred = $.Deferred();
 
-			_call.call(this, {
+			_get.call(this, {
 				url: '/shots/'+shotId+'/like',
 				success: function(){
 
@@ -52,14 +72,13 @@
 		}
 
 		this.likeShot = function(shotId){
-			return _call.call(this, {
-				url: '/shots/'+shotId+'/like',
-				type: 'POST'
+			return _post.call(this, {
+				url: '/shots/'+shotId+'/like'
 			});
 		}
 
 		this.unlikeShot = function(shotId){
-			return _call.call(this, {
+			return _post.call(this, {
 				url: '/shots/'+shotId+'/like',
 				type: 'DELETE'
 			});
