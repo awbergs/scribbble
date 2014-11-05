@@ -6,6 +6,13 @@
 
 	<body>
 
+		<button value="Like" id="like">Like</button>
+		<button value="Unlike" id="unlike">Unlike</button>
+
+		<input type='text' value='1781057' id="shotid" />
+
+		<button value="Check Like Status" id="checklikestatus">Check Like Status</button>
+
 		<script type='text/javascript' src='../lib/jquery-2.1.1.min.js'></script>
 		<script type='text/javascript' src='../src/plugin.js'></script>
 		<script type='text/javascript'>
@@ -13,7 +20,17 @@
 			var api = new scribbble();
 			api.setToken(TOKEN);
 
-			api.getShot('1781057');
+			$("#like").on("click", function(){
+				api.likeShot($("#shotid").val());
+			});
+
+			$("#unlike").on("click", function(){
+				api.unlikeShot($("#shotid").val());
+			});
+
+			$("#checklikestatus").on("click" , function(){
+				api.doesCurrentUserLikeShot($("#shotid").val());
+			});
 		</script>
 	</body>
 
