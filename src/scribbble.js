@@ -11,33 +11,11 @@
 			opts.type = 'GET';
 
 			var oldSuccess = opts.success || function(){};
-			opts.success = function(a,b,c){
-				console.log(arguments);
+			opts.success = function(){
 				oldSuccess.apply(this, arguments);
 			}
 			return $.ajax(opts);
 		}
-
-		// var _post = function(opts){
-		// 	opts.url = _apiEndpoint + opts.url + "?callback=jsonpcallback";
-		// 	opts.type = opts.type || 'POST';
-
-		// 	var oldSuccess = opts.success || function(){};
-		// 	opts.success = function(a,b,c){
-		// 		console.log(arguments);
-		// 		oldSuccess.call(this, arguments);
-		// 	}
-
-		// 	opts.crossDomain = true;
-		// 	opts.dataType = "jsonp";
-		// 	opts.jsonp = true;
-
-		// 	opts.beforeSend = function (request) {
-  //               request.setRequestHeader("Authorization", this.token);
-  //           }
-
-		// 	return $.ajax(opts);
-		// }
 
 		this.setToken = function(token){
 			this.token = token;
@@ -53,16 +31,33 @@
 			var _this = this;
 			return _get.call(this, {
 				url: _apiEndpoint + '/user',
-				success: function(a,b,c){
-					_this._currentUser = a;
+				success: function(user){
+					_this._currentUser = user;
 				}
 			})
 		}
 
 		this.getCurrentUserLikes = function(user){
-			return _get.call(this, {
-				url: this._currentUser.likes_url
-			});
+			if(this._currentUser){
+				return _get.call(this, {
+					url: this._currentUser.likes_url
+				});	
+			}
+			else {
+				var deferred = $.Deferred();
+
+				var _this = this;
+
+				$.when(this.getCurrentUser()).then(function(){
+					$.when(_get.call(_this, {
+						url: _this._currentUser.likes_url
+					})).then(function(resp){
+						deferred.resolve(resp);
+					});
+				});
+
+				return deferred.promise();
+			}
 		}
 
 		this.doesCurrentUserLikeShot = function(shotId){
@@ -76,28 +71,13 @@
 				},
 				error: function(resp){
 					if(resp.status === 404){
-						deferred.resolve(false)
-
+						deferred.resolve(false);
 					}
 				}
 			});
 
 			return deferred.promise();
 		}
-
-		// this.likeShot = function(shotId){
-		// 	return _post.call(this, {
-		// 		url: '/shots/'+shotId+'/like'
-		// 	});
-		// }
-
-		// this.unlikeShot = function(shotId){
-		// 	return _post.call(this, {
-		// 		url: '/shots/'+shotId+'/like',
-		// 		type: 'DELETE'
-		// 	});
-
-		// }
 
 	}
 
