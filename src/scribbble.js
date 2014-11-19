@@ -83,5 +83,28 @@
 
 	_window.scribbble = _;
 
+	$(document).on("ready", function(){
+		
+		var api = new _();
+
+		api.setToken(document.getElementById('scribble-token').value);
+
+		$(".scribbble-shot").each(function(i, el){
+			var $el = $(el),
+				shotId = $el.data("shotid");
+
+			$.when(api.getShot(shotId), api.doesCurrentUserLikeShot(shotId)).then(function(shot, likesShot){
+
+				var likeText = likesShot ? "Unlike" : "Like";
+
+				$el.append($("<a href='"+shot.html_url+"' target='_blank' class='shot-link'>"+likeText+"</a>"))
+					.append($("<span class='shot-likes'>"+shot.likes_count+"</span>"));
+
+			}, function(){
+				//error, remove element
+				$el.remove();
+			});
+		});
+	});
 
 })(jQuery, window);
