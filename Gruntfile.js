@@ -9,15 +9,23 @@ module.exports = function(grunt) {
       },
       build: {
         src: 'src/<%= pkg.name %>.js',
-        dest: 'build/<%= pkg.name %>.min.js'
+        dest: 'build/scribbble/js/<%= pkg.name %>.min.js'
+      }
+    },
+    copy: {
+      main:{
+        files: [
+          {src: 'src/scribbble.php', dest: 'build/scribbble/scribbble.php'}
+        ] 
       }
     }
   });
 
   // Load the plugin that provides the "uglify" task.
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
   // Default task(s).
-  grunt.registerTask('default', ['uglify']);
+  grunt.registerTask('default', ['uglify', 'copy']);
 
 };
