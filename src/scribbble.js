@@ -87,20 +87,25 @@
 		
 		var api = new _();
 
-		api.setToken(document.getElementById('scribble-token').value);
+		api.setToken(document.getElementById('scribbble-token').value);
 
 		$(".scribbble-shot").each(function(i, el){
 			var $el = $(el),
 				shotId = $el.data("shotid");
 
-			$.when(api.getShot(shotId), api.doesCurrentUserLikeShot(shotId)).then(function(shot, likesShot){
+			$.when(api.getShot(shotId)).then(function(shot){
+				$.when(api.doesCurrentUserLikeShot(shotId)).then(function(likesShot){
 
 				var likeText = likesShot ? "Unlike" : "Like";
 
-				$el.append($("<a href='"+shot.html_url+"' target='_blank' class='shot-link'>"+likeText+"</a>"))
+				$el.addClass(likesShot ? 'likes' : '').append($("<a href='"+shot.html_url+"' target='_blank' class='shot-link'>"+likeText+"</a>"))
 					.append($("<span class='shot-likes'>"+shot.likes_count+"</span>"));
 
+				},function (){
+					console.log('err like shot');
+				});
 			}, function(){
+				console.log('err get shot');
 				//error, remove element
 				$el.remove();
 			});

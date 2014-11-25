@@ -10,6 +10,7 @@
  */
 
 //[scribbble]
+
 function scribbble_func( $atts ){
 	return '<div class="scribbble-shot" data-shotid="' . $atts['shot'] . '"></div>';
 }
@@ -17,7 +18,7 @@ function scribbble_func( $atts ){
 add_shortcode( 'scribbble', 'scribbble_func' );
 
 function scribbble_scripts(){
-    wp_enqueue_script( 'scribbble', plugins_url('/scribbble.min.js', __FILE__), null, null, true );
+    wp_enqueue_script( 'scribbble', plugins_url('js/scribbble.min.js', __FILE__), null, null, true );
 }
 add_action( 'wp_enqueue_scripts', 'scribbble_scripts' );
 
@@ -28,7 +29,7 @@ add_action( 'wp_enqueue_scripts', 'scribbble_styles' );
 
 function scribbble_settings(){
 
-	add_option('scribbble_token', '');
+    register_setting( 'general', 'scribbble_token' );
 
     add_settings_section(  
         'scribbble_settings_section', // Section ID 
@@ -60,7 +61,8 @@ function scribbble_settings_callback($args) {  // Textbox Callback
 add_action( 'admin_init', 'scribbble_settings' );
 
 function scribbble_write_token(){
-	echo '<input type="hidden" id="scribbble-token" value=' . get_option('scribbble_token') . ' />';
+    $option = get_option('scribbble_token');
+	echo '<input type="hidden" id="scribbble-token" value="' . $option . '" />';
 }
 add_action( 'wp_head', 'scribbble_write_token' );
 
